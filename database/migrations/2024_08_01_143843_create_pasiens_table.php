@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('pasiens', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->string('no_rm')->nullable();
             $table->enum('jk', ['L', 'P']);
             $table->string('nama')->nullable();
@@ -22,6 +24,10 @@ return new class extends Migration
             $table->string('tgl_lahir')->nullable();
             $table->string('alamat')->nullable();
             $table->string('no_hp')->nullable();
+            $table->enum('jenis_pengobatan', ['Umum', 'BPJS']);
+            $table->enum('status_perkawinan', ['Kawin', 'Belum Kawin']);
+            $table->enum('pendidikan', ['Tidak Sekolah', 'Belum Sekolah', 'TK', 'SD', 'SLTP', 'SLTA', 'Akademi', 'S1', 'S2', 'S3'])->nullable();
+            $table->enum('pekerjaan', ['Pelajar/Mahasiswa', 'Wiraswasta', 'PNS', 'Pensiunan', 'Pegawai Swasta', 'Tidak Bekerja', 'Profesional', 'IRT', 'TNI/POLRI', 'Petani/Buruh/Nelayan/Lainnya'])->nullable();
             $table->timestamps();
         });
     }

@@ -24,4 +24,9 @@ class RekamMedis extends Model
     {
         return $this->belongsTo(Diagnosa::class);
     }
+
+    public function obats()
+    {
+        return $this->hasMany(RekamMedisObat::class);
+    }
 }

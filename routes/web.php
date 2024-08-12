@@ -26,23 +26,20 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect('/login');
 });
 
 Route::get('/dashboard', function () {
+    if (auth()->user()->role == 'dokter' || auth()->user()->role == 'pasien') {
+        return redirect('/rekammedis');
+    }
     $countPasien = Pasien::count();
     $countDokter = User::where('role', 'dokter')->count();
     $countObat = Obat::count();
     $countDiagnosa = Diagnosa::count();
     return Inertia::render('Dashboard', ["countPasien" => $countPasien, "countDokter" => $countDokter, "countObat" => $countObat, "countDiagnosa" => $countDiagnosa]);
 })
-    ->name('dashboard');
-//    ->middleware(['auth', 'verified'])->name('dashboard');
+    ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
@@ -56,6 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/dokter/{dokter}', [DokterController::class, 'destroy'])->name('dokter.destroy');
 
     Route::get('/pasien', [PasienController::class, 'index'])->name('pasien.index');
+    Route::get('/pasien/{pasien}', [PasienController::class, 'show'])->name('pasien.show');
     Route::post('/pasien', [PasienController::class, 'store'])->name('pasien.store');
     Route::patch('/pasien/{pasien}', [PasienController::class, 'update'])->name('pasien.update');
     Route::delete('/pasien/{pasien}', [PasienController::class, 'destroy'])->name('pasien.destroy');

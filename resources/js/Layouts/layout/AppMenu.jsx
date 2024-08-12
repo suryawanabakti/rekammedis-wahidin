@@ -3,11 +3,13 @@ import AppMenuitem from "./AppMenuitem";
 import { LayoutContext } from "./context/layoutcontext";
 import { MenuProvider } from "./context/menucontext";
 import { Link } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 
 const AppMenu = () => {
     const { layoutConfig } = useContext(LayoutContext);
-
-    const model = [
+    const { auth } = usePage().props;
+    console.log(auth.user);
+    const modelAdmin = [
         {
             label: "Menu",
             items: [
@@ -20,6 +22,11 @@ const AppMenu = () => {
                     label: "Master Data",
                     icon: "pi pi-fw pi-database",
                     items: [
+                        {
+                            label: "Diagnosa",
+                            icon: "pi pi-fw pi-box",
+                            to: route("diagnosa.index"),
+                        },
                         {
                             label: "Obat",
                             icon: "pi pi-fw pi-box",
@@ -45,22 +52,60 @@ const AppMenu = () => {
             ],
         },
     ];
-
+    const modelDokter = [
+        {
+            label: "Menu",
+            items: [
+                {
+                    label: "Rekam Medis",
+                    icon: "pi pi-fw pi-search",
+                    to: route("rekammedis.index"),
+                },
+            ],
+        },
+    ];
     return (
         <MenuProvider>
             <ul className="layout-menu">
-                {model.map((item, i) => {
-                    return !item?.seperator ? (
-                        <AppMenuitem
-                            item={item}
-                            root={true}
-                            index={i}
-                            key={item.label}
-                        />
-                    ) : (
-                        <li className="menu-separator"></li>
-                    );
-                })}
+                {auth.user.role == "admin" &&
+                    modelAdmin.map((item, i) => {
+                        return !item?.seperator ? (
+                            <AppMenuitem
+                                item={item}
+                                root={true}
+                                index={i}
+                                key={item.label}
+                            />
+                        ) : (
+                            <li className="menu-separator"></li>
+                        );
+                    })}
+                {auth.user.role == "pasien" &&
+                    modelDokter.map((item, i) => {
+                        return !item?.seperator ? (
+                            <AppMenuitem
+                                item={item}
+                                root={true}
+                                index={i}
+                                key={item.label}
+                            />
+                        ) : (
+                            <li className="menu-separator"></li>
+                        );
+                    })}
+                {auth.user.role == "dokter" &&
+                    modelDokter.map((item, i) => {
+                        return !item?.seperator ? (
+                            <AppMenuitem
+                                item={item}
+                                root={true}
+                                index={i}
+                                key={item.label}
+                            />
+                        ) : (
+                            <li className="menu-separator"></li>
+                        );
+                    })}
             </ul>
         </MenuProvider>
     );

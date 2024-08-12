@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Diagnosa extends Model
 {
     use HasFactory;
+    protected $guarded = ['id'];
 }

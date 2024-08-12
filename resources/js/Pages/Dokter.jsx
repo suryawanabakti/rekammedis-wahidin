@@ -124,7 +124,9 @@ export default function Dokter({ dokters }) {
             });
             setDokter(emptyDokter);
         } catch (error) {
-            console.log(error);
+            console.log(error.response);
+            setErrors(error.response?.data?.errors ?? []);
+            alert(error.response?.data?.message ?? "Something wrong");
         }
     };
     const footerDialogTambah = (e) => {
@@ -192,7 +194,9 @@ export default function Dokter({ dokters }) {
             setDokter(emptyDokter);
             setDialogEdit(false);
         } catch (error) {
-            console.log(error);
+            console.log(error.response);
+            setErrors(error.response?.data?.errors ?? []);
+            alert(error.response?.data?.message ?? "Something wrong");
         }
     };
     const footerDialogEdit = (e) => {

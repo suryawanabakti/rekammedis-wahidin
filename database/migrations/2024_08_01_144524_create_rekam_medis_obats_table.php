@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('rekam_medis_obats', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('rekam_medis_id')->unique();
+            $table->unsignedBigInteger('rekam_medis_id');
             $table->foreign('rekam_medis_id')->references('id')->on('rekam_medis')->cascadeOnDelete();
-            $table->unsignedBigInteger('obat_id')->unique();
+            $table->unsignedBigInteger('obat_id');
             $table->foreign('obat_id')->references('id')->on('obats')->cascadeOnDelete();
             $table->integer('qty')->default(0);
             $table->timestamps();

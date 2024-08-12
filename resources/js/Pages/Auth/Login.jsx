@@ -62,12 +62,12 @@ export default function Login({ status, canResetPassword }) {
                                     htmlFor="email"
                                     className="block text-900 font-medium mb-2"
                                 >
-                                    Email
+                                    No.RM / Username
                                 </label>
                                 <InputText
                                     id="email"
                                     type="text"
-                                    placeholder="Email address"
+                                    placeholder="..."
                                     className="w-full"
                                     value={data.email}
                                     onChange={(e) =>
@@ -103,23 +103,6 @@ export default function Login({ status, canResetPassword }) {
                             </div>
 
                             <div className="flex align-items-center justify-content-between mb-6">
-                                <div className="flex align-items-center">
-                                    <Checkbox
-                                        inputId="rememberme-login"
-                                        onChange={(e) =>
-                                            setData(
-                                                "remember",
-                                                e.target.checked
-                                            )
-                                        }
-                                        checked={data.remember}
-                                        className="mr-2"
-                                    />
-                                    <label htmlFor="rememberme-login">
-                                        Remember me
-                                    </label>
-                                </div>
-
                                 {canResetPassword && (
                                     <Link
                                         href={route("password.request")}

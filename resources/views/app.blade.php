@@ -21,7 +21,7 @@
     </link>
 </head>
 
-<body class="font-sans antialiased" style="zoom: 90%">
+<body class="font-sans antialiased">
     @inertia
 </body>
 

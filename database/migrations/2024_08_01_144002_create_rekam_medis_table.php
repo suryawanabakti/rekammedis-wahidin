@@ -17,9 +17,12 @@ return new class extends Migration
             $table->foreign('pasien_id')->references('id')->on('pasiens')->cascadeOnDelete();
             $table->unsignedBigInteger('dokter_id');
             $table->foreign('dokter_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->string('diagnosa');
-            // $table->unsignedBigInteger('diagnosa_id')->unique();
-            // $table->foreign('diagnosa_id')->references('id')->on('diagnosas')->cascadeOnDelete();
+            $table->date('tgl_masuk');
+            $table->date('tgl_keluar');
+            $table->enum('keadaan_keluar', ['Sembuh', 'Membaik', 'Belum Sembuh', 'Mati < 48 Jam', 'Mati > 48 Jam']);
+            $table->enum('cara_keluar', ['Diijinkan Pulang', 'Pulang Paksa', 'Dirujuk', 'Lari', 'Pindah RS']);
+            $table->unsignedBigInteger('diagnosa_id');
+            $table->foreign('diagnosa_id')->references('id')->on('diagnosas')->cascadeOnDelete();
             $table->text('keluhan')->nullable();
             $table->timestamps();
         });

@@ -13,29 +13,29 @@ import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 
-export default function Obat({ obats }) {
-    const [dataObat, setDataObat] = useState([]);
+export default function Obat({ diagnosas }) {
+    const [dataDiagnosa, setDataDiagnosa] = useState([]);
     const [globalFilter, setGlobalFilter] = useState("");
     useEffect(() => {
-        setDataObat(obats);
+        setDataDiagnosa(diagnosas);
     }, []);
     const onInputSearch = (e) => {
         var val = e.target.value;
         setGlobalFilter(val ? val : []);
     };
 
-    let emptyObat = {
+    let emptyDiagnosa = {
         id: "",
         kode: "",
         nama: "",
     };
 
-    const [obat, setObat] = useState(emptyObat);
+    const [diagnosa, setDiagnosa] = useState(emptyDiagnosa);
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || "";
-        let _obat = { ...obat };
-        _obat[`${name}`] = val;
-        setObat(_obat);
+        let _diagnosa = { ...diagnosa };
+        _diagnosa[`${name}`] = val;
+        setDiagnosa(_diagnosa);
     };
 
     const [errors, setErrors] = useState([]);
@@ -79,7 +79,7 @@ export default function Obat({ obats }) {
             acceptClassName: "p-button-danger",
             accept: async () => {
                 try {
-                    await axios.delete(route("obat.destroy", rowData.id));
+                    await axios.delete(route("diagnosa.destroy", rowData.id));
                     toast.current.show({
                         severity: "info",
                         summary: "Confirmed",
@@ -87,7 +87,7 @@ export default function Obat({ obats }) {
                         life: 3000,
                     });
 
-                    setDataObat((prevItems) =>
+                    setDataDiagnosa((prevItems) =>
                         prevItems.filter((item) => item.id !== rowData.id)
                     );
                 } catch (e) {
@@ -109,18 +109,18 @@ export default function Obat({ obats }) {
     };
     const submit = async (e) => {
         try {
-            const res = await axios.post(route("obat.store"), obat);
-            const updatedData = [res.data, ...dataObat];
-            setDataObat(updatedData);
+            const res = await axios.post(route("diagnosa.store"), diagnosa);
+            const updatedData = [res.data, ...dataDiagnosa];
+            setDataDiagnosa(updatedData);
 
             setDialogTambah(false);
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "You have success create obat " + res.data.nama,
+                detail: "You have success create diagnosa " + res.data.nama,
                 life: 3000,
             });
-            setObat(emptyObat);
+            setDiagnosa(emptyDiagnosa);
         } catch (error) {
             console.log(error.response);
             setErrors(error.response?.data?.errors ?? []);
@@ -141,7 +141,7 @@ export default function Obat({ obats }) {
         );
     };
     const onHideDialog = () => {
-        setObat(emptyObat);
+        setDiagnosa(emptyDiagnosa);
         setErrors([]);
         setDialogTambah(false);
     };
@@ -151,18 +151,21 @@ export default function Obat({ obats }) {
 
     const openEdit = (data) => {
         setDialogEdit(true);
-        setObat(data);
+        setDiagnosa(data);
     };
     const onHideDialog2 = () => {
-        setObat(emptyObat);
+        setDiagnosa(emptyDiagnosa);
         setErrors([]);
         setDialogEdit(false);
     };
     const [dialogEdit, setDialogEdit] = useState(false);
     const submit2 = async (e) => {
         try {
-            const res = await axios.patch(route("obat.update", obat.id), obat);
-            setDataObat((prevItems) =>
+            const res = await axios.patch(
+                route("diagnosa.update", diagnosa.id),
+                diagnosa
+            );
+            setDataDiagnosa((prevItems) =>
                 prevItems.map((item) =>
                     item.id === res.data.id
                         ? {
@@ -176,10 +179,10 @@ export default function Obat({ obats }) {
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "You have success updated obat " + res.data.nama,
+                detail: "You have success updated diagnosa " + res.data.nama,
                 life: 3000,
             });
-            setObat(emptyObat);
+            setDiagnosa(emptyDiagnosa);
             setDialogEdit(false);
         } catch (error) {
             console.log(error.response);
@@ -216,7 +219,7 @@ export default function Obat({ obats }) {
     const renderHeader = () => {
         return (
             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-                <h5>Obat</h5>
+                <h5>Diagnosa</h5>
                 <span className="p-input-icon-left">
                     <i className="pi pi-search" />
                     <InputText
@@ -241,7 +244,7 @@ export default function Obat({ obats }) {
                             left={leftToolbarTemplate}
                         ></Toolbar>
                         <DataTable
-                            value={dataObat}
+                            value={dataDiagnosa}
                             paginator
                             dataKey="id"
                             rows={10}
@@ -249,14 +252,14 @@ export default function Obat({ obats }) {
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                             globalFilter={globalFilter}
-                            emptyMessage="Tidak ada obat"
+                            emptyDiagnosa="Tidak ada diagnosa"
                             globalFilterFields={["nama", "kode"]}
                             header={header}
                         >
                             <Column
                                 headerClassName="fw-bold"
                                 field="kode"
-                                header="Kode Obat"
+                                header="Kode Diagnosa"
                                 sortable
                                 filterPlaceholder="kode"
                                 style={{ minWidth: "20rem" }}
@@ -265,7 +268,7 @@ export default function Obat({ obats }) {
                             <Column
                                 headerClassName="fw-bold"
                                 field="nama"
-                                header="Nama Obat"
+                                header="Nama diagnosa"
                                 sortable
                                 filterPlaceholder="nama"
                                 style={{ minWidth: "20rem" }}
@@ -285,7 +288,7 @@ export default function Obat({ obats }) {
                 visible={dialogEdit}
                 style={{ width: "32rem" }}
                 breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-                header="Edit Obat"
+                header="Edit Diagnosa"
                 modal
                 className="p-fluid"
                 footer={footerDialogEdit}
@@ -293,13 +296,13 @@ export default function Obat({ obats }) {
             >
                 <div className="field">
                     <label htmlFor="kode" className="font-bold">
-                        Kode obat
+                        Kode diagnosa
                     </label>
                     <InputText
                         id="kode"
                         required
                         autoFocus
-                        value={obat.kode}
+                        value={diagnosa.kode}
                         onChange={(e) => onInputChange(e, "kode")}
                         placeholder="Masukkan Kode"
                     />
@@ -309,15 +312,15 @@ export default function Obat({ obats }) {
                 </div>
                 <div className="field">
                     <label htmlFor="nama" className="font-bold">
-                        Nama Obat
+                        Nama Diagnosa
                     </label>
                     <InputText
                         id="nama"
                         required
                         autoFocus
-                        value={obat.nama}
+                        value={diagnosa.nama}
                         onChange={(e) => onInputChange(e, "nama")}
-                        placeholder="Masukkan Nama Obat"
+                        placeholder="Masukkan Nama Diagnosa"
                     />
                     {errors.nama && (
                         <small className="p-error">{errors.nama}</small>
@@ -329,7 +332,7 @@ export default function Obat({ obats }) {
                 visible={dialogTambah}
                 style={{ width: "32rem" }}
                 breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-                header="New Obat"
+                header="New Diagnosa"
                 modal
                 className="p-fluid"
                 footer={footerDialogTambah}
@@ -337,13 +340,13 @@ export default function Obat({ obats }) {
             >
                 <div className="field">
                     <label htmlFor="kode" className="font-bold">
-                        Kode obat
+                        Kode diagnosa
                     </label>
                     <InputText
                         id="kode"
                         required
                         autoFocus
-                        value={obat.kode}
+                        value={diagnosa.kode}
                         onChange={(e) => onInputChange(e, "kode")}
                         placeholder="Masukkan Kode"
                     />
@@ -359,7 +362,7 @@ export default function Obat({ obats }) {
                         id="nama"
                         required
                         autoFocus
-                        value={obat.nama}
+                        value={diagnosa.nama}
                         onChange={(e) => onInputChange(e, "nama")}
                         placeholder="Masukkan Nama Obat"
                     />
