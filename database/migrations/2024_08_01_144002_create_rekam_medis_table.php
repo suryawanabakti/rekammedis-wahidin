@@ -21,9 +21,14 @@ return new class extends Migration
             $table->date('tgl_keluar');
             $table->enum('keadaan_keluar', ['Sembuh', 'Membaik', 'Belum Sembuh', 'Mati < 48 Jam', 'Mati > 48 Jam']);
             $table->enum('cara_keluar', ['Diijinkan Pulang', 'Pulang Paksa', 'Dirujuk', 'Lari', 'Pindah RS']);
-            $table->unsignedBigInteger('diagnosa_id');
-            $table->foreign('diagnosa_id')->references('id')->on('diagnosas')->cascadeOnDelete();
+            $table->string('diagnosa')->nullable();
+            $table->string('diagnosa_akhir')->nullable();
             $table->text('keluhan')->nullable();
+
+            // Rujukan
+            $table->string('nomor_surat')->nullable();
+            // $table->string('')
+            $table->string('dirujuk_ke')->nullable();
             $table->timestamps();
         });
     }

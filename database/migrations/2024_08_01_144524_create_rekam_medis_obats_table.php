@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('obat_id');
             $table->foreign('obat_id')->references('id')->on('obats')->cascadeOnDelete();
             $table->integer('qty')->default(0);
+            $table->text('pemberian')->nullable();
             $table->timestamps();
         });
     }

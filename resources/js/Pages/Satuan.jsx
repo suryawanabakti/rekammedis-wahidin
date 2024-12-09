@@ -5,7 +5,6 @@ import { Column } from "primereact/column";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
@@ -14,45 +13,29 @@ import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 
-export default function Obat({ obats, satuans, categories }) {
-    const [dataObat, setDataObat] = useState([]);
-    const [selectedCategory, setSeletedCategory] = useState(null);
-    const [selectedSatuan, setSelectedSatuan] = useState(null);
+export default function satuan({ satuans }) {
+    const [datasatuan, setDatasatuan] = useState([]);
     const [globalFilter, setGlobalFilter] = useState("");
     useEffect(() => {
-        setDataObat(obats);
+        setDatasatuan(satuans);
     }, []);
     const onInputSearch = (e) => {
         var val = e.target.value;
         setGlobalFilter(val ? val : []);
     };
-    let emptyObat = {
+
+    let emptysatuan = {
         id: "",
-        satuan_id: "",
-        category_id: "",
-        kode: "",
+        singkatan: "",
         nama: "",
     };
-    const onCategoryChange = (e) => {
-        setSeletedCategory(e.value);
-        let _obat = { ...obat };
-        _obat[`category_id`] = e.value.id;
-        setObat(_obat);
-    };
 
-    const onSatuanChange = (e) => {
-        setSelectedSatuan(e.value);
-        let _obat = { ...obat };
-        _obat[`satuan_id`] = e.value.id;
-        setObat(_obat);
-    };
-
-    const [obat, setObat] = useState(emptyObat);
+    const [satuan, setsatuan] = useState(emptysatuan);
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || "";
-        let _obat = { ...obat };
-        _obat[`${name}`] = val;
-        setObat(_obat);
+        let _satuan = { ...satuan };
+        _satuan[`${name}`] = val;
+        setsatuan(_satuan);
     };
 
     const [errors, setErrors] = useState([]);
@@ -96,7 +79,7 @@ export default function Obat({ obats, satuans, categories }) {
             acceptClassName: "p-button-danger",
             accept: async () => {
                 try {
-                    await axios.delete(route("obat.destroy", rowData.id));
+                    await axios.delete(route("satuan.destroy", rowData.id));
                     toast.current.show({
                         severity: "info",
                         summary: "Confirmed",
@@ -104,7 +87,7 @@ export default function Obat({ obats, satuans, categories }) {
                         life: 3000,
                     });
 
-                    setDataObat((prevItems) =>
+                    setDatasatuan((prevItems) =>
                         prevItems.filter((item) => item.id !== rowData.id)
                     );
                 } catch (e) {
@@ -126,20 +109,18 @@ export default function Obat({ obats, satuans, categories }) {
     };
     const submit = async (e) => {
         try {
-            const res = await axios.post(route("obat.store"), obat);
-            const updatedData = [res.data, ...dataObat];
-            setDataObat(updatedData);
+            const res = await axios.post(route("satuan.store"), satuan);
+            const updatedData = [res.data, ...datasatuan];
+            setDatasatuan(updatedData);
 
             setDialogTambah(false);
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "You have success create obat " + res.data.nama,
+                detail: "You have success create satuan " + res.data.nama,
                 life: 3000,
             });
-            setSelectedSatuan(null);
-            setSeletedCategory(null);
-            setObat(emptyObat);
+            setsatuan(emptysatuan);
         } catch (error) {
             console.log(error.response);
             setErrors(error.response?.data?.errors ?? []);
@@ -160,7 +141,7 @@ export default function Obat({ obats, satuans, categories }) {
         );
     };
     const onHideDialog = () => {
-        setObat(emptyObat);
+        setsatuan(emptysatuan);
         setErrors([]);
         setDialogTambah(false);
     };
@@ -170,26 +151,27 @@ export default function Obat({ obats, satuans, categories }) {
 
     const openEdit = (data) => {
         setDialogEdit(true);
-        setObat(data);
+        setsatuan(data);
     };
     const onHideDialog2 = () => {
-        setObat(emptyObat);
+        setsatuan(emptysatuan);
         setErrors([]);
         setDialogEdit(false);
     };
     const [dialogEdit, setDialogEdit] = useState(false);
     const submit2 = async (e) => {
         try {
-            const res = await axios.patch(route("obat.update", obat.id), obat);
-            setDataObat((prevItems) =>
+            const res = await axios.patch(
+                route("satuan.update", satuan.id),
+                satuan
+            );
+            setDatasatuan((prevItems) =>
                 prevItems.map((item) =>
                     item.id === res.data.id
                         ? {
                               ...item,
                               nama: res.data.nama,
-                              kode: res.data.kode,
-                              satuan: res.data.satuan,
-                              category: res.data.category,
+                              singkatan: res.data.singkatan,
                           }
                         : item
                 )
@@ -197,10 +179,10 @@ export default function Obat({ obats, satuans, categories }) {
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "You have success updated obat " + res.data.nama,
+                detail: "You have success updated satuan " + res.data.nama,
                 life: 3000,
             });
-            setObat(emptyObat);
+            setsatuan(emptysatuan);
             setDialogEdit(false);
         } catch (error) {
             console.log(error.response);
@@ -237,7 +219,7 @@ export default function Obat({ obats, satuans, categories }) {
     const renderHeader = () => {
         return (
             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-                <h5>Obat</h5>
+                <h5>satuan</h5>
                 <span className="p-input-icon-left">
                     <i className="pi pi-search" />
                     <InputText
@@ -262,7 +244,7 @@ export default function Obat({ obats, satuans, categories }) {
                             left={leftToolbarTemplate}
                         ></Toolbar>
                         <DataTable
-                            value={dataObat}
+                            value={datasatuan}
                             paginator
                             dataKey="id"
                             rows={10}
@@ -270,45 +252,27 @@ export default function Obat({ obats, satuans, categories }) {
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                             globalFilter={globalFilter}
-                            emptyMessage="Tidak ada obat"
-                            globalFilterFields={["nama", "kode"]}
+                            emptyMessage="Tidak ada satuan"
+                            globalFilterFields={["nama", "singkatan"]}
                             header={header}
                         >
                             <Column
                                 headerClassName="fw-bold"
-                                field="kode"
-                                header="Kode Obat"
+                                field="singkatan"
+                                header="Singkatan"
                                 sortable
-                                filterPlaceholder="kode"
-                                style={{ minWidth: "10rem" }}
-                                headerStyle={{ width: "10rem" }}
+                                filterPlaceholder="singkatan"
+                                style={{ minWidth: "20rem" }}
+                                headerStyle={{ width: "20rem" }}
                             />
                             <Column
                                 headerClassName="fw-bold"
                                 field="nama"
-                                header="Nama Obat"
+                                header="Nama satuan"
                                 sortable
                                 filterPlaceholder="nama"
-                                style={{ minWidth: "15rem" }}
-                                headerStyle={{ width: "15rem" }}
-                            />
-                            <Column
-                                headerClassName="fw-bold"
-                                field="satuan.nama"
-                                header="Satuan"
-                                sortable
-                                filterPlaceholder="satuan.nama"
-                                style={{ minWidth: "10rem" }}
-                                headerStyle={{ width: "10rem" }}
-                            />
-                            <Column
-                                headerClassName="fw-bold"
-                                field="category.nama"
-                                header="Category"
-                                sortable
-                                filterPlaceholder="category.nama"
-                                style={{ minWidth: "10rem" }}
-                                headerStyle={{ width: "10rem" }}
+                                style={{ minWidth: "20rem" }}
+                                headerStyle={{ width: "20rem" }}
                             />
 
                             <Column
@@ -324,76 +288,42 @@ export default function Obat({ obats, satuans, categories }) {
                 visible={dialogEdit}
                 style={{ width: "32rem" }}
                 breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-                header="Edit Obat"
+                header="Edit satuan"
                 modal
                 className="p-fluid"
                 footer={footerDialogEdit}
                 onHide={() => onHideDialog2()}
             >
                 <div className="field">
-                    <label htmlFor="kode" className="font-bold">
-                        Kode obat
+                    <label htmlFor="singkatan" className="font-bold">
+                        singkatan satuan
                     </label>
                     <InputText
-                        id="kode"
+                        id="singkatan"
                         required
                         autoFocus
-                        value={obat.kode}
-                        onChange={(e) => onInputChange(e, "kode")}
-                        placeholder="Masukkan Kode"
+                        value={satuan.singkatan}
+                        onChange={(e) => onInputChange(e, "singkatan")}
+                        placeholder="Masukkan singkatan"
                     />
-                    {errors.kode && (
-                        <small className="p-error">{errors.kode}</small>
+                    {errors.singkatan && (
+                        <small className="p-error">{errors.singkatan}</small>
                     )}
                 </div>
                 <div className="field">
                     <label htmlFor="nama" className="font-bold">
-                        Nama Obat
+                        Nama satuan
                     </label>
                     <InputText
                         id="nama"
                         required
                         autoFocus
-                        value={obat.nama}
+                        value={satuan.nama}
                         onChange={(e) => onInputChange(e, "nama")}
-                        placeholder="Masukkan Nama Obat"
+                        placeholder="Masukkan Nama satuan"
                     />
                     {errors.nama && (
                         <small className="p-error">{errors.nama}</small>
-                    )}
-                </div>
-                <div className="field">
-                    <label htmlFor="category" className="font-bold">
-                        Kategori
-                    </label>
-                    <Dropdown
-                        showClear
-                        filter
-                        value={selectedCategory}
-                        options={categories}
-                        onChange={onCategoryChange}
-                        optionLabel="nama"
-                        placeholder="Select a Category"
-                    />
-                    {errors.category_id && (
-                        <small className="p-error">{errors.category_id}</small>
-                    )}
-                </div>
-                <div className="field">
-                    <label htmlFor="satuan" className="font-bold">
-                        Satuan
-                    </label>
-                    <Dropdown
-                        showClear
-                        filter
-                        value={selectedSatuan}
-                        options={satuans}
-                        onChange={onSatuanChange}
-                        optionLabel="nama"
-                        placeholder="Select a Unit"
-                    />
-                    {errors.satuan_id && (
-                        <small className="p-error">{errors.satuan_id}</small>
                     )}
                 </div>
             </Dialog>
@@ -402,77 +332,42 @@ export default function Obat({ obats, satuans, categories }) {
                 visible={dialogTambah}
                 style={{ width: "32rem" }}
                 breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-                header="New Obat"
+                header="New satuan"
                 modal
                 className="p-fluid"
                 footer={footerDialogTambah}
                 onHide={() => onHideDialog()}
             >
                 <div className="field">
-                    <label htmlFor="kode" className="font-bold">
-                        Kode obat
+                    <label htmlFor="singkatan" className="font-bold">
+                        singkatan satuan
                     </label>
                     <InputText
-                        id="kode"
+                        id="singkatan"
                         required
                         autoFocus
-                        value={obat.kode}
-                        onChange={(e) => onInputChange(e, "kode")}
-                        placeholder="Masukkan Kode"
+                        value={satuan.singkatan}
+                        onChange={(e) => onInputChange(e, "singkatan")}
+                        placeholder="Masukkan singkatan"
                     />
-                    {errors.kode && (
-                        <small className="p-error">{errors.kode}</small>
+                    {errors.singkatan && (
+                        <small className="p-error">{errors.singkatan}</small>
                     )}
                 </div>
                 <div className="field">
                     <label htmlFor="nama" className="font-bold">
-                        Nama Obat
+                        Nama satuan
                     </label>
                     <InputText
                         id="nama"
                         required
                         autoFocus
-                        value={obat.nama}
+                        value={satuan.nama}
                         onChange={(e) => onInputChange(e, "nama")}
-                        placeholder="Masukkan Nama Obat"
+                        placeholder="Masukkan Nama satuan"
                     />
                     {errors.nama && (
                         <small className="p-error">{errors.nama}</small>
-                    )}
-                </div>
-
-                <div className="field">
-                    <label htmlFor="category" className="font-bold">
-                        Kategori
-                    </label>
-                    <Dropdown
-                        showClear
-                        filter
-                        value={selectedCategory}
-                        options={categories}
-                        onChange={onCategoryChange}
-                        optionLabel="nama"
-                        placeholder="Select a Category"
-                    />
-                    {errors.category_id && (
-                        <small className="p-error">{errors.category_id}</small>
-                    )}
-                </div>
-                <div className="field">
-                    <label htmlFor="satuan" className="font-bold">
-                        Satuan
-                    </label>
-                    <Dropdown
-                        showClear
-                        filter
-                        value={selectedSatuan}
-                        options={satuans}
-                        onChange={onSatuanChange}
-                        optionLabel="nama"
-                        placeholder="Select a Unit"
-                    />
-                    {errors.satuan_id && (
-                        <small className="p-error">{errors.satuan_id}</small>
                     )}
                 </div>
             </Dialog>

@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { LayoutContext } from "@/Layouts/layout/context/layoutcontext";
 import Layout from "@/Layouts/layout/layout.jsx";
 import DashboardInfoCard from "@/Components/DashboardInfoCard.jsx";
-import { ConfirmPopup } from "primereact/confirmpopup";
 
 const Dashboard = ({
     auth,
@@ -16,7 +15,6 @@ const Dashboard = ({
 
     return (
         <Layout>
-            <ConfirmPopup />
             {auth.user.role == "admin" && (
                 <div className="grid">
                     <DashboardInfoCard

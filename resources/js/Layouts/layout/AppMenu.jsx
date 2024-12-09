@@ -11,7 +11,7 @@ const AppMenu = () => {
     console.log(auth.user);
     const modelAdmin = [
         {
-            label: "Menu",
+            label: "DASHBOARD",
             items: [
                 {
                     label: "Dashboard",
@@ -19,35 +19,42 @@ const AppMenu = () => {
                     to: route("dashboard"),
                 },
                 {
-                    label: "Master Data",
-                    icon: "pi pi-fw pi-database",
+                    label: "Rekam Medis",
+                    icon: "pi pi-fw pi-search",
+                    to: route("rekammedis.index"),
+                },
+            ],
+        },
+        {
+            label: "Master Data",
+            items: [
+                {
+                    label: "Obat",
+                    icon: "pi pi-fw pi-box",
                     items: [
                         {
-                            label: "Diagnosa",
-                            icon: "pi pi-fw pi-box",
-                            to: route("diagnosa.index"),
+                            label: "Satuan",
+                            to: route("satuan.index"),
                         },
                         {
-                            label: "Obat",
-                            icon: "pi pi-fw pi-box",
+                            label: "Kategori",
+                            to: route("category.index"),
+                        },
+                        {
+                            label: "Data Obat",
                             to: route("obat.index"),
-                        },
-                        {
-                            label: "Dokter",
-                            icon: "pi pi-fw pi-users",
-                            to: route("dokter.index"),
-                        },
-                        {
-                            label: "Pasien",
-                            icon: "pi pi-fw pi-users",
-                            to: route("pasien.index"),
                         },
                     ],
                 },
                 {
-                    label: "Rekam Medis",
-                    icon: "pi pi-fw pi-search",
-                    to: route("rekammedis.index"),
+                    label: "Dokter",
+                    icon: "pi pi-fw pi-users",
+                    to: route("dokter.index"),
+                },
+                {
+                    label: "Pasien",
+                    icon: "pi pi-fw pi-users",
+                    to: route("pasien.index"),
                 },
             ],
         },

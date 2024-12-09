@@ -20,7 +20,7 @@ const DetailPasien = ({ auth, pasien, rekamMedis }) => {
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
-
+    const ref = useRef(null);
     useEffect(() => {
         setDataRekamMedis(rekamMedis);
     }, []);
@@ -29,11 +29,16 @@ const DetailPasien = ({ auth, pasien, rekamMedis }) => {
             <div className="grid">
                 <div className="col-12">
                     <div className="flex mb-2 justify-content-between">
-                        <Button
-                            label="Kembali"
-                            link
-                            onClick={() => router.visit(route("pasien.index"))}
-                        />
+                        {auth.user.role != "pasien" && (
+                            <Button
+                                label="Kembali"
+                                link
+                                onClick={() =>
+                                    router.visit(route("pasien.index"))
+                                }
+                            />
+                        )}
+
                         <div className="flex gap-2">
                             <Button
                                 onClick={() => setActiveIndex(0)}
@@ -93,93 +98,63 @@ const DetailPasien = ({ auth, pasien, rekamMedis }) => {
                             </p>
                         </TabPanel>
                         <TabPanel header="Rekam Medis">
-                            <DataTable
-                                header={() => (
-                                    <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-                                        <h5>
-                                            {pasien.nama} - {pasien.no_rm}
-                                        </h5>
-                                        <span className="p-input-icon-left">
-                                            <i className="pi pi-search" />
-                                            <InputText
-                                                type="search"
-                                                onInput={(e) =>
-                                                    onInputSearch(e)
-                                                }
-                                                placeholder="Global Search"
-                                            />
-                                        </span>
-                                    </div>
-                                )}
-                                value={dataRekamMedis}
-                                paginator
-                                dataKey="id"
-                                rows={10}
-                                rowsPerPageOptions={[5, 10, 25]}
-                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                                globalFilter={globalFilter}
-                                emptyMessage="Tidak ada Rekam Medis"
-                            >
-                                <Column
-                                    headerClassName="fw-bold"
-                                    body={(rowData) => {
-                                        return moment(
-                                            rowData.created_at
-                                        ).format("DD/MM/YYYY ~ hh:mm:ss");
-                                    }}
-                                    header="Tanggal"
-                                    filter
-                                    sortable
-                                    filterPlaceholder="Tanggal"
-                                    style={{ minWidth: "15rem" }}
-                                    headerStyle={{ width: "15rem" }}
-                                />
-
-                                <Column
-                                    headerClassName="fw-bold"
-                                    field="dokter.nama"
-                                    header="Dokter"
-                                    filter
-                                    sortable
-                                    filterPlaceholder="Nama Dokter"
-                                    style={{ minWidth: "15rem" }}
-                                    headerStyle={{ width: "15rem" }}
-                                />
-                                <Column
-                                    headerClassName="fw-bold"
-                                    field="diagnosa.nama"
-                                    header="Diagnosa"
-                                    filter
-                                    filterPlaceholder="diagnosa"
-                                    style={{ minWidth: "10rem" }}
-                                    headerStyle={{ width: "10rem" }}
-                                />
-
-                                <Column
-                                    headerClassName="fw-bold"
-                                    field="keluhan"
-                                    header="Keluhan"
-                                    filterPlaceholder="keluhan"
-                                    filter
-                                    style={{ minWidth: "20rem" }}
-                                    headerStyle={{ width: "20rem" }}
-                                />
-                                <Column
-                                    headerClassName="fw-bold"
-                                    field="obats"
-                                    header="Obat"
-                                    filter
-                                    filterPlaceholder="obat"
-                                    body={(rowData) => {
-                                        return rowData.obats?.map((data) => {
-                                            return <div>{data.obat?.nama}</div>;
-                                        });
-                                    }}
-                                    style={{ minWidth: "10rem" }}
-                                    headerStyle={{ width: "10rem" }}
-                                />
-                            </DataTable>
+                            {rekamMedis.map((data) => {
+                                return (
+                                    <Panel
+                                        className="mb-3"
+                                        ref={ref}
+                                        header={`Masuk : ${moment(
+                                            data.created_at
+                                        ).format(
+                                            "DD/MM/YYYY"
+                                        )} , Keluar : ${moment(
+                                            data.tgl_keluar
+                                        ).format("DD/MM/YYYY")}`}
+                                        toggleable
+                                    >
+                                        <div className="grid">
+                                            <div className="col-6">
+                                                <p className="m-0">
+                                                    Dokter DPJP :{" "}
+                                                    {data.dokter.nama} <br />
+                                                    Keluhan : {data.keluhan}
+                                                    Diagnosa Awal{" "}
+                                                    {data.diagnosa} <br />
+                                                    Diagnosa Akhir{" "}
+                                                    {data.diagnosa_akhir} <br />
+                                                    Keadaan Keluar:{" "}
+                                                    {data.keadaan_keluar}
+                                                    <br />
+                                                    Cara Keluar:{" "}
+                                                    {data.cara_keluar}
+                                                    {data.cara_keluar ===
+                                                        "Dirujuk" && (
+                                                        <div>
+                                                            Nomor Surat :{" "}
+                                                            {data.nomor_surat}{" "}
+                                                            <br />
+                                                            Dirujuk Ke :{" "}
+                                                            {data.dirujuk_ke}
+                                                        </div>
+                                                    )}
+                                                </p>
+                                            </div>
+                                            <div className="col-6">
+                                                Daftar Obat : <br />
+                                                {data.obats?.map((data) => {
+                                                    return (
+                                                        <>
+                                                            {data.obat.kode} -{" "}
+                                                            {data.obat.nama}
+                                                            <br />
+                                                        </>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </Panel>
+                                );
+                            })}
                         </TabPanel>
                     </TabView>
                 </div>

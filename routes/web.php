@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DiagnosaController;
 use App\Http\Controllers\DokterController;
 use App\Http\Controllers\ObatController;
 use App\Http\Controllers\PasienController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RekamMedisController;
+use App\Http\Controllers\SatuanController;
 use App\Models\Diagnosa;
 use App\Models\Obat;
 use App\Models\Pasien;
@@ -30,18 +32,34 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    if (auth()->user()->role == 'dokter' || auth()->user()->role == 'pasien') {
+    if (auth()->user()->role == 'dokter') {
         return redirect('/rekammedis');
+    }
+
+    if (auth()->user()->role == 'pasien') {
+        $pasien = Pasien::where('user_id', auth()->id())->first();
+        return redirect("/pasien/$pasien->id");
     }
     $countPasien = Pasien::count();
     $countDokter = User::where('role', 'dokter')->count();
     $countObat = Obat::count();
+
     $countDiagnosa = Diagnosa::count();
     return Inertia::render('Dashboard', ["countPasien" => $countPasien, "countDokter" => $countDokter, "countObat" => $countObat, "countDiagnosa" => $countDiagnosa]);
 })
     ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/satuan', [SatuanController::class, 'index'])->name('satuan.index');
+    Route::post('/satuan', [SatuanController::class, 'store'])->name('satuan.store');
+    Route::patch('/satuan/{satuan}', [SatuanController::class, 'update'])->name('satuan.update');
+    Route::delete('/satuan/{satuan}', [SatuanController::class, 'destroy'])->name('satuan.destroy');
+
+    Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
+    Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
+    Route::patch('/category/{category}', [CategoryController::class, 'update'])->name('category.update');
+    Route::delete('/category/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
+
     Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
     Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
     Route::patch('/obat/{obat}', [ObatController::class, 'update'])->name('obat.update');
@@ -68,6 +86,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/rekammedis', [RekamMedisController::class, 'store'])->name('rekammedis.store');
     Route::patch('/rekammedis/{rekammedis}', [RekamMedisController::class, 'update'])->name('rekammedis.update');
     Route::delete('/rekammedis/{rekammedis}', [RekamMedisController::class, 'destroy'])->name('rekammedis.destroy');
+    Route::get('/rekammedis/{rekammedis}/print', [RekamMedisController::class, 'print'])->name('rekammedis.print');
+    Route::get('/rekammedis/{rekammedis}/surat', [RekamMedisController::class, 'surat'])->name('rekammedis.surat');
+    Route::get('/rekammedis/printAll', [RekamMedisController::class, 'printAll'])->name('rekammedis.printAll');
 
 
 

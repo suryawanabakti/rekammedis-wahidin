@@ -12,6 +12,9 @@ class DokterController extends Controller
 {
     public function index()
     {
+        if (auth()->user()->role == 'pasien') {
+            return redirect('/dashboard');
+        }
         return Inertia::render("Dokter", ["dokters" => Dokter::with('user')->orderBy('created_at', 'DESC')->get()]);
     }
 
@@ -23,11 +26,9 @@ class DokterController extends Controller
             "email" => ['required', 'max:255', 'email', Rule::unique(User::class, "email")],
             "password" => ['required']
         ]);
-
         $validatedData['password'] = bcrypt($request->password);
         $validatedData['role'] = 'dokter';
         $user = User::create($validatedData);
-
         $dokter = Dokter::create([
             "user_id" => $user->id,
             "kode" => $request->kode,
@@ -55,5 +56,10 @@ class DokterController extends Controller
         ]);
 
         return Dokter::with('user')->findOrFail($dokter->id);
+    }
+
+    public function destroy(Dokter $dokter)
+    {
+        User::where('id', $dokter->user_id)->delete();
     }
 }

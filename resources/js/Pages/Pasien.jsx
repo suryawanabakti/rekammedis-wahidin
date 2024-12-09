@@ -29,6 +29,7 @@ export default function Pasien({ pasiens }) {
     let emptyPasien = {
         id: "",
         no_rm: "",
+        username: "",
         nama: "",
         alamat: "",
         gol_darah: "",
@@ -162,7 +163,22 @@ export default function Pasien({ pasiens }) {
 
     const openEdit = (data) => {
         setDialogEdit(true);
-        setPasien(data);
+        setPasien({
+            id: data.id,
+            no_rm: data.no_rm,
+            username: data.user.email,
+            nama: data.nama,
+            alamat: data.alamat,
+            gol_darah: data.gol_darah,
+            tgl_lahir: data.tgl_lahir,
+            nik: data.nik,
+            no_bpjs: data.no_bpjs,
+            no_hp: data.no_hp,
+            jenis_pengobatan: data.jenis_pengobatan,
+            status_perkawinan: data.status_perkawinan,
+            pendidikan: data.pendidikan,
+            pekerjaan: data.pekerjaan,
+        });
     };
 
     const onHideDialog2 = () => {
@@ -191,6 +207,7 @@ export default function Pasien({ pasiens }) {
                               status_perkawinan: res.data.status_perkawinan,
                               pendidikan: res.data.pendidikan,
                               pekerjaan: res.data.pekerjaan,
+                              user: res.data.user,
                           }
                         : item
                 )
@@ -286,6 +303,15 @@ export default function Pasien({ pasiens }) {
                                 exportable={false}
                                 style={{ minWidth: "12rem" }}
                             ></Column>
+                            <Column
+                                headerClassName="fw-bold"
+                                field="user.email"
+                                header="Username"
+                                sortable
+                                filterPlaceholder="Username"
+                                style={{ minWidth: "12rem" }}
+                                headerStyle={{ width: "12rem" }}
+                            />
                             <Column
                                 headerClassName="fw-bold"
                                 field="no_rm"
@@ -384,6 +410,22 @@ export default function Pasien({ pasiens }) {
                     />
                     {errors.no_rm && (
                         <small className="p-error">{errors.no_rm}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="username" className="font-bold">
+                        Username
+                    </label>
+                    <InputText
+                        id="username"
+                        required
+                        autoFocus
+                        value={pasien.username}
+                        onChange={(e) => onInputChange(e, "username")}
+                        placeholder="Masukkan Nama Pasien"
+                    />
+                    {errors.username && (
+                        <small className="p-error">{errors.username}</small>
                     )}
                 </div>
                 <div className="field">
@@ -901,6 +943,22 @@ export default function Pasien({ pasiens }) {
                     />
                     {errors.no_rm && (
                         <small className="p-error">{errors.no_rm}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="username" className="font-bold">
+                        Username
+                    </label>
+                    <InputText
+                        id="username"
+                        required
+                        autoFocus
+                        value={pasien.username}
+                        onChange={(e) => onInputChange(e, "username")}
+                        placeholder="Masukkan Nama Pasien"
+                    />
+                    {errors.username && (
+                        <small className="p-error">{errors.username}</small>
                     )}
                 </div>
                 <div className="field">

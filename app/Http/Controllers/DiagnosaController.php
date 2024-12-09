@@ -11,6 +11,9 @@ class DiagnosaController extends Controller
 {
     public function index()
     {
+        if (auth()->user()->role == 'pasien') {
+            return redirect('/dashboard');
+        }
         return Inertia::render("Diagnosa", ["diagnosas" => Diagnosa::orderBy('created_at', 'desc')->get()]);
     }
 
@@ -20,7 +23,6 @@ class DiagnosaController extends Controller
             'nama' => ['required', 'max:255'],
             'kode' => ['required', 'max:255']
         ]);
-
         return Diagnosa::create($validatedData);
     }
 
@@ -30,7 +32,6 @@ class DiagnosaController extends Controller
             'nama' => ['required', 'max:255'],
             'kode' => ['required', 'max:255', Rule::unique(Diagnosa::class, 'kode')->ignore($diagnosa->id)]
         ]);
-
         $diagnosa->update($validatedData);
         return $diagnosa;
     }

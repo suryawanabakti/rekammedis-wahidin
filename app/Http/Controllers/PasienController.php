@@ -12,16 +12,18 @@ class PasienController extends Controller
 {
     public function index()
     {
-        return Inertia::render("Pasien", ["pasiens" => Pasien::orderBy('created_at', 'desc')->get()->map(function ($data) {
+        if (auth()->user()->role == 'pasien') {
+            return redirect('/dashboard');
+        }
+        return Inertia::render("Pasien", ["pasiens" => Pasien::with('user')->orderBy('created_at', 'desc')->get()->map(function ($data) {
             $data['tanggal'] = $data->created_at->format('d M Y');
             return $data;
         })]);
     }
 
-    public function show(Request $request)
+    public function show(Pasien $pasien)
     {
-        $pasien = Pasien::where('id', $request->pasien)->first();
-        $rekamMedis = RekamMedis::with('dokter', 'diagnosa')->where('pasien_id', $request->pasien)->get();
+        $rekamMedis = RekamMedis::with('dokter', 'obats.obat')->where('pasien_id', $pasien->id)->get();
         return Inertia::render("DetailPasien", ["pasien" => $pasien, "rekamMedis" => $rekamMedis]);
     }
 
@@ -29,6 +31,7 @@ class PasienController extends Controller
     {
         $validatedData = $request->validate([
             'no_rm' => ['required', 'max:255'],
+            'username' => ['required', 'max:255'],
             'nama' => ['required', 'max:255'],
             'nik' => ['required', 'max:255'],
             'no_bpjs' => ['required', 'max:255'],
@@ -44,8 +47,8 @@ class PasienController extends Controller
 
         $user =  User::create([
             'nama' => $request->nama,
-            'email' => $request->no_rm,
-            'password' => bcrypt($request->no_rm),
+            'email' => $request->username,
+            'password' => bcrypt($request->username),
             'role' => 'pasien'
         ]);
 
@@ -53,7 +56,8 @@ class PasienController extends Controller
 
         $pasien = Pasien::create($validatedData);
         $pasien['tanggal'] = $pasien->created_at->format('d M Y');
-        return $pasien;
+
+        return $pasien->load('user');
     }
 
     public function update(Request $request, Pasien $pasien)
@@ -61,6 +65,7 @@ class PasienController extends Controller
         $validatedData = $request->validate([
             'no_rm' => ['required', 'max:255'],
             'nama' => ['required', 'max:255'],
+            'username' => ['required', 'max:255'],
             'nik' => ['required', 'max:255'],
             'no_bpjs' => ['required', 'max:255'],
             'gol_darah' => ['required', 'max:255'],
@@ -71,9 +76,9 @@ class PasienController extends Controller
             'pekerjaan' => [''],
             'pendidikan' => [''],
         ]);
-
+        $pasien->user()->update(['nama' => $request->nama, 'email' => $request->username]);
         $pasien->update($validatedData);
-        return $pasien;
+        return $pasien->load('user');
     }
 
     public function destroy(Pasien $pasien)

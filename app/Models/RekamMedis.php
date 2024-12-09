@@ -20,10 +20,6 @@ class RekamMedis extends Model
         return $this->belongsTo(Pasien::class);
     }
 
-    public function diagnosa()
-    {
-        return $this->belongsTo(Diagnosa::class);
-    }
 
     public function obats()
     {

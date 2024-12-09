@@ -33,7 +33,7 @@ const AppTopbar = forwardRef((props, ref) => {
                     alt="logo"
                 />
 
-                <span>RS Wahidin Sudirhasono</span>
+                <span>RS Wahidin Sudirohusodo </span>
             </Link>
 
             <button

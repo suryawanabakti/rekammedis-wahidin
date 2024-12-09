@@ -41,12 +41,15 @@ export default function RekamMedis({
         pasien_id: "",
         dokter_id: "",
         diagnosa: "",
+        diagnosa_akhir: "",
         keluhan: "",
         obats: "",
         tgl_masuk: "",
         tgl_keluar: "",
         keadaan_keluar: "",
         cara_keluar: "",
+        nomor_surat: "",
+        dirujuk_ke: "",
     };
 
     const [medis, setMedis] = useState(emptyMedis);
@@ -61,6 +64,7 @@ export default function RekamMedis({
     };
 
     const onDiagnosaChange = (e) => {
+        console.log("CHANGE", e.value);
         setSelectedDiagnosa(e.value);
         let _medis = { ...medis };
         _medis[`diagnosa`] = e.value.id;
@@ -76,15 +80,6 @@ export default function RekamMedis({
 
     const [selectedObats, setSelectedObats] = useState([]);
 
-    // const [selectedDiagnosa, setSelectedDiagnosa] = useState(null);
-
-    // const onDiagnosaChange = (e) => {
-    //     setSelectedDiagnosa(e.value);
-    //     let _medis = { ...medis };
-    //     _medis[`diagnosa_id`] = e.value.id;
-    //     setMedis(_medis);
-    // };
-
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || "";
         let _medis = { ...medis };
@@ -96,6 +91,16 @@ export default function RekamMedis({
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
+                <Button
+                    icon="pi pi-print"
+                    rounded
+                    outlined
+                    className="mr-2"
+                    onClick={() =>
+                        (location.href = `/rekammedis/${rowData.id}/print`)
+                    }
+                />
+
                 <Button
                     icon="pi pi-pencil"
                     rounded
@@ -174,7 +179,14 @@ export default function RekamMedis({
                 life: 3000,
             });
             console.log("RESPON", res);
-            setMedis(emptyMedis);
+
+            setSelectedDiagnosa(null);
+            setSelectedObats(null);
+            setSelectedPasien(null);
+            if (res.data.cara_keluar == "Dirujuk") {
+                alert("PASIEN DIRUJUK");
+                location.href = `/rekammedis/${res.data.id}/surat`;
+            }
         } catch (error) {
             console.log(error.response);
             setErrors(error.response?.data?.errors ?? []);
@@ -197,6 +209,9 @@ export default function RekamMedis({
     const onHideDialog = () => {
         setMedis(emptyMedis);
         setErrors([]);
+        setSelectedDiagnosa(null);
+        setSelectedObats(null);
+        setSelectedPasien(null);
         setDialogTambah(false);
     };
     // END TAMBAH
@@ -205,10 +220,32 @@ export default function RekamMedis({
 
     const openEdit = (data) => {
         setDialogEdit(true);
-        setMedis(data);
+        console.log(data);
+        setSelectedPasien({
+            id: data.pasien?.id,
+            nama: `${data.pasien?.no_rm} - ${data.pasien?.nama}`,
+        });
+
+        setSelectedDiagnosa({
+            id: data.diagnosa?.id,
+            nama: `${data.diagnosa?.nama}`,
+        });
+        setMedis({
+            id: data.id,
+            pasien_id: data.pasien_id,
+            tgl_masuk: data.tgl_masuk,
+            tgl_keluar: data.tgl_keluar,
+            diagnosa: data.diagnosa,
+            keadaan_keluar: data.keadaan_keluar,
+            cara_keluar: data.cara_keluar,
+            keluhan: data.keluhan,
+        });
     };
     const onHideDialog2 = () => {
         setMedis(emptyMedis);
+        setSelectedDiagnosa(null);
+        setSelectedObats(null);
+        setSelectedPasien(null);
         setErrors([]);
         setDialogEdit(false);
     };
@@ -239,12 +276,20 @@ export default function RekamMedis({
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "You have success updated rekam medis " + res.data.id,
+                detail: "You have success updated rekam medis ",
                 life: 3000,
             });
             setMedis(emptyMedis);
+            setSelectedDiagnosa(null);
+            setSelectedObats(null);
+            setSelectedPasien(null);
             setDialogEdit(false);
+            if (res.data.cara_keluar == "Dirujuk") {
+                alert("PASIEN DIRUJUK");
+                location.href = `/rekammedis/${res.data.id}/surat`;
+            }
         } catch (error) {
+            console.log(error);
             console.log(error.response);
             setErrors(error.response?.data?.errors ?? []);
             alert(error.response?.data?.message ?? "Something wrong");
@@ -279,7 +324,14 @@ export default function RekamMedis({
     const rightToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
-                <Button label="Export" icon="pi pi-export" severity="warning" />
+                <Button
+                    label="Export"
+                    icon="pi pi-export"
+                    severity="warning"
+                    onClick={() =>
+                        (location.href = route("rekammedis.printAll"))
+                    }
+                />
             </div>
         );
     };
@@ -353,7 +405,7 @@ export default function RekamMedis({
                                 hidden={auth.user.role === "pasien"}
                                 body={actionBodyTemplate}
                                 exportable={false}
-                                style={{ minWidth: "10rem" }}
+                                style={{ minWidth: "15rem" }}
                             ></Column>
                             <Column
                                 headerClassName="fw-bold"
@@ -378,7 +430,7 @@ export default function RekamMedis({
                                         <Link
                                             href={route(
                                                 "pasien.show",
-                                                rowData.id
+                                                rowData.pasien_id
                                             )}
                                         >
                                             {rowData.pasien.no_rm}
@@ -414,9 +466,10 @@ export default function RekamMedis({
                                 style={{ minWidth: "15rem" }}
                                 headerStyle={{ width: "15rem" }}
                             />
+
                             <Column
                                 headerClassName="fw-bold"
-                                field="diagnosa.nama"
+                                field="diagnosa"
                                 header="Diagnosa"
                                 filter
                                 filterPlaceholder="diagnosa"
@@ -468,7 +521,6 @@ export default function RekamMedis({
                     <Dropdown
                         showClear
                         filter
-                        filterBy="name"
                         value={selectedPasien}
                         options={pasiens}
                         onChange={onPasienChange}
@@ -517,15 +569,13 @@ export default function RekamMedis({
                     <label htmlFor="diagnosa" className="font-bold">
                         Diagnosa
                     </label>
-                    <Dropdown
-                        showClear
-                        filter
-                        filterBy="diagnosa"
-                        value={selectedDiagnosa}
-                        options={diagnosas}
-                        onChange={onDiagnosaChange}
-                        optionLabel="nama"
-                        placeholder="Select a Diagnosa"
+                    <InputText
+                        id="diagnosa"
+                        required
+                        autoFocus
+                        value={medis.diagnosa}
+                        onChange={(e) => onInputChange(e, "diagnosa")}
+                        placeholder="Masukkan diagnosa"
                     />
                     {errors.diagnosa && (
                         <small className="p-error">{errors.diagnosa}</small>
@@ -563,6 +613,9 @@ export default function RekamMedis({
                         filter
                         showClear
                     />
+                    {errors.obats && (
+                        <small className="p-error">{errors.obats}</small>
+                    )}
                 </div>
                 <div className="field">
                     <label htmlFor="keadaan_keluar" className="font-bold">
@@ -726,6 +779,26 @@ export default function RekamMedis({
                         </div>
                     </div>
                 </div>
+                {medis.cara_keluar == "Dirujuk" && (
+                    <div className="field">
+                        <label htmlFor="nomor_surat" className="font-bold">
+                            Nomor Surat
+                        </label>
+                        <InputText
+                            id="nomor_surat"
+                            required
+                            autoFocus
+                            value={medis.nomor_surat}
+                            onChange={(e) => onInputChange(e, "nomor_surat")}
+                            placeholder="Masukkan nomor_surat"
+                        />
+                        {errors.nomor_surat && (
+                            <small className="p-error">
+                                {errors.nomor_surat}
+                            </small>
+                        )}
+                    </div>
+                )}
             </Dialog>
 
             <Dialog
@@ -745,7 +818,6 @@ export default function RekamMedis({
                     <Dropdown
                         showClear
                         filter
-                        filterBy="name"
                         value={selectedPasien}
                         options={pasiens}
                         onChange={onPasienChange}
@@ -794,18 +866,34 @@ export default function RekamMedis({
                     <label htmlFor="diagnosa" className="font-bold">
                         Diagnosa
                     </label>
-                    <Dropdown
-                        showClear
-                        filter
-                        filterBy="diagnosa"
-                        value={selectedDiagnosa}
-                        options={diagnosas}
-                        onChange={onDiagnosaChange}
-                        optionLabel="nama"
-                        placeholder="Select a Diagnosa"
+                    <InputText
+                        id="diagnosa"
+                        required
+                        autoFocus
+                        value={medis.diagnosa}
+                        onChange={(e) => onInputChange(e, "diagnosa")}
+                        placeholder="Masukkan diagnosa"
                     />
                     {errors.diagnosa && (
                         <small className="p-error">{errors.diagnosa}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="diagnosa_akhir" className="font-bold">
+                        Diagnosa Akhir
+                    </label>
+                    <InputText
+                        id="diagnosa_akhir"
+                        required
+                        autoFocus
+                        value={medis.diagnosa_akhir}
+                        onChange={(e) => onInputChange(e, "diagnosa_akhir")}
+                        placeholder="Masukkan Diagnosa Akhir"
+                    />
+                    {errors.diagnosa_akhir && (
+                        <small className="p-error">
+                            {errors.diagnosa_akhir}
+                        </small>
                     )}
                 </div>
 
@@ -1014,6 +1102,46 @@ export default function RekamMedis({
                         <small className="p-error">{errors.cara_keluar}</small>
                     )}
                 </div>
+                {medis.cara_keluar == "Dirujuk" && (
+                    <div className="field">
+                        <label htmlFor="nomor_surat" className="font-bold">
+                            Nomor Surat
+                        </label>
+                        <InputText
+                            id="nomor_surat"
+                            required
+                            autoFocus
+                            value={medis.nomor_surat}
+                            onChange={(e) => onInputChange(e, "nomor_surat")}
+                            placeholder="Masukkan Nomor Surat"
+                        />
+                        {errors.nomor_surat && (
+                            <small className="p-error">
+                                {errors.nomor_surat}
+                            </small>
+                        )}
+                    </div>
+                )}
+                {medis.cara_keluar == "Dirujuk" && (
+                    <div className="field">
+                        <label htmlFor="dirujuk_ke" className="font-bold">
+                            Dirujuk ke
+                        </label>
+                        <InputText
+                            id="dirujuk_ke"
+                            required
+                            autoFocus
+                            value={medis.dirujuk_ke}
+                            onChange={(e) => onInputChange(e, "dirujuk_ke")}
+                            placeholder="Masukkan Nomor Surat"
+                        />
+                        {errors.dirujuk_ke && (
+                            <small className="p-error">
+                                {errors.dirujuk_ke}
+                            </small>
+                        )}
+                    </div>
+                )}
             </Dialog>
         </Layout>
     );
